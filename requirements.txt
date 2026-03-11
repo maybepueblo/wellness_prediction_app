@@ -1,0 +1,9 @@
+# Dependencias del proyecto Wellness
+fastapi
+uvicorn[standard]
+python-jose[cryptography]
+bcrypt
+scikit-learn
+pandas
+numpy
+matplotlib

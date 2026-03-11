@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wellness — Encuesta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d1a0f; --surface:#141f16; --surface2:#1a2b1d;
+    --border:#1e3022; --green:#4ade80; --green-dim:#22c55e;
+    --mint:#bbf7d0; --text:#e8f5e9; --muted:#6b8f72; --error:#f87171;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%, rgba(74,222,128,.06) 0%, transparent 60%);
+    pointer-events:none;
+  }
+
+  header {
+    position:sticky; top:0; z-index:100;
+    background:rgba(13,26,15,.85); backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+    padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between;
+  }
+  .header-brand { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--mint); }
+  .header-user { font-size:.85rem; color:var(--muted); display:flex; align-items:center; gap:1rem; }
+  .logout-btn {
+    background:none; border:1px solid var(--border); border-radius:6px;
+    color:var(--muted); padding:.35rem .75rem; font-size:.8rem; cursor:pointer;
+    transition:all .2s; font-family:'DM Sans',sans-serif;
+  }
+  .logout-btn:hover { color:var(--error); border-color:var(--error); }
+
+  .progress-bar { height:3px; background:var(--border); position:sticky; top:57px; z-index:99; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,#4ade80,#16a34a); transition:width .4s ease; width:0%; }
+
+  main { max-width:680px; margin:0 auto; padding:3rem 1.5rem 4rem; }
+
+  .survey-header { text-align:center; margin-bottom:2.5rem; animation:fadeUp .5s ease both; }
+  .survey-header h2 { font-family:'Playfair Display',serif; font-size:2rem; color:var(--mint); margin-bottom:.4rem; }
+  .survey-header p { color:var(--muted); font-weight:300; font-size:.95rem; }
+
+  /* Perfil guardado (modo diario) */
+  .perfil-card {
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-left:3px solid var(--green-dim);
+    border-radius:14px;
+    padding:1.1rem 1.4rem;
+    margin-bottom:2rem;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+    animation:fadeUp .4s ease both;
+  }
+  .perfil-info { display:flex; gap:1.5rem; flex-wrap:wrap; }
+  .perfil-dato { display:flex; flex-direction:column; }
+  .perfil-dato-label { font-size:.68rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .perfil-dato-val { font-size:.95rem; font-weight:500; color:var(--mint); }
+  .perfil-edit-btn {
+    background:none; border:1px solid var(--border); border-radius:8px;
+    color:var(--muted); padding:.35rem .8rem; font-size:.78rem; cursor:pointer;
+    white-space:nowrap; font-family:'DM Sans',sans-serif; transition:all .2s;
+  }
+  .perfil-edit-btn:hover { color:var(--text); border-color:var(--muted); }
+
+  .section { margin-bottom:2rem; animation:fadeUp .5s ease both; }
+  .section-title {
+    font-size:.75rem; font-weight:500; text-transform:uppercase; letter-spacing:.1em;
+    color:var(--green-dim); margin-bottom:1rem; padding-bottom:.5rem;
+    border-bottom:1px solid var(--border); display:flex; align-items:center; gap:.5rem;
+  }
+  .section-title span { font-size:1rem; }
+
+  .fields-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  @media(max-width:520px){ .fields-grid{ grid-template-columns:1fr; } }
+
+  .field-group {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:1rem 1.1rem; transition:border-color .2s;
+  }
+  .field-group:focus-within { border-color:var(--green-dim); }
+  .field-group label {
+    display:block; font-size:.75rem; font-weight:500; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.05em; margin-bottom:.4rem;
+  }
+  .field-group .hint { font-size:.7rem; color:var(--muted); margin-top:.2rem; opacity:.7; }
+
+  input[type="number"], select {
+    width:100%; background:transparent; border:none; color:var(--text);
+    font-family:'DM Sans',sans-serif; font-size:1rem; outline:none; padding:0;
+  }
+  input[type="number"]::-webkit-inner-spin-button { opacity:.3; }
+
+  .slider-wrap { display:flex; align-items:center; gap:.75rem; }
+  input[type="range"] {
+    flex:1; height:4px; -webkit-appearance:none;
+    background:var(--border); border-radius:2px; cursor:pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance:none; width:16px; height:16px;
+    background:var(--green); border-radius:50%;
+    box-shadow:0 2px 8px rgba(74,222,128,.4);
+  }
+  .slider-val { min-width:28px; text-align:right; font-size:.9rem; font-weight:500; color:var(--green); }
+
+  .bmi-display { font-size:1.3rem; font-weight:600; color:var(--green); }
+  .bmi-label { font-size:.75rem; color:var(--muted); margin-left:.3rem; }
+
+  .submit-area { text-align:center; margin-top:2.5rem; }
+  .btn-submit {
+    display:inline-flex; align-items:center; gap:.6rem;
+    padding:1rem 2.5rem;
+    background:linear-gradient(135deg,#4ade80,#16a34a);
+    border:none; border-radius:12px; color:#0d1a0f;
+    font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:600;
+    cursor:pointer; transition:transform .15s, box-shadow .15s; letter-spacing:.01em;
+  }
+  .btn-submit:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(74,222,128,.35); }
+  .btn-submit:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+  .error-msg {
+    background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3);
+    border-radius:8px; padding:.75rem 1rem; color:var(--error);
+    font-size:.85rem; margin-top:1rem; display:none;
+  }
+  .error-msg.show { display:block; animation:fadeUp .3s ease; }
+
+  /* Ocultar secciones de perfil en modo diario */
+  .solo-primera { display:block; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">🌿 Wellness</div>
+  <div class="header-user">
+    <span id="header-username"></span>
+    <button class="logout-btn" onclick="logout()">Salir</button>
+  </div>
+</header>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<main>
+  <div class="survey-header">
+    <h2 id="survey-title">Cargando...</h2>
+    <p id="survey-subtitle"></p>
+  </div>
+
+  <!-- Resumen del perfil guardado (solo en modo diario) -->
+  <div id="perfil-card" class="perfil-card" style="display:none">
+    <div class="perfil-info" id="perfil-info"></div>
+    <button class="perfil-edit-btn" onclick="activarModoCompleto()">✏️ Actualizar perfil</button>
+  </div>
+
+  <form id="survey-form" onsubmit="return false;">
+
+    <!-- DATOS PERSONALES (solo primera vez) -->
+    <div class="section solo-primera" id="seccion-personal">
+      <div class="section-title"><span>👤</span> Datos personales</div>
+      <div class="fields-grid">
+        <div class="field-group">
+          <label>Edad</label>
+          <input type="number" id="edad" min="15" max="100" placeholder="30">
+          <div class="hint">años</div>
+        </div>
+        <div class="field-group">
+          <label>Sexo</label>
+          <select id="sexo">
+            <option value="0">Femenino</option>
+            <option value="1">Masculino</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Altura</label>
+          <input type="number" id="altura" min="140" max="220" placeholder="170" oninput="calcBMI()">
+          <div class="hint">cm</div>
+        </div>
+        <div class="field-group">
+          <label>Peso</label>
+          <input type="number" id="peso" min="30" max="200" placeholder="70" step="0.1" oninput="calcBMI()">
+          <div class="hint">kg</div>
+        </div>
+        <div class="field-group">
+          <label>IMC calculado</label>
+          <div><span class="bmi-display" id="bmi-display">—</span><span class="bmi-label" id="bmi-label"></span></div>
+          <input type="hidden" id="bmi" value="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- SUEÑO -->
+    <div class="section">
+      <div class="section-title"><span>😴</span> Sueño y estrés</div>
+      <div class="fields-grid">
+        <div class="field-group">
+          <label>Horas de sueño</label>
+          <div class="slider-wrap">
+            <input type="range" id="h_sueno" min="3" max="12" step="0.5" value="7" oninput="syncSlider(this,'h_sueno_val')">
+            <span class="slider-val" id="h_sueno_val">7</span>
+          </div>
+          <div class="hint">horas por noche</div>
+        </div>
+        <div class="field-group">
+          <label>Calidad del sueño</label>
+          <div class="slider-wrap">
+            <input type="range" id="c_sueno" min="1" max="10" step="0.5" value="6" oninput="syncSlider(this,'c_sueno_val')">
+            <span class="slider-val" id="c_sueno_val">6</span>
+          </div>
+          <div class="hint">1 = muy mala · 10 = excelente</div>
+        </div>
+        <div class="field-group">
+          <label>Nivel de estrés</label>
+          <div class="slider-wrap">
+            <input type="range" id="n_estres" min="1" max="10" step="0.5" value="5" oninput="syncSlider(this,'n_estres_val')">
+            <span class="slider-val" id="n_estres_val">5</span>
+          </div>
+          <div class="hint">1 = sin estrés · 10 = muy estresado</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANTALLAS -->
+    <div class="section">
+      <div class="section-title"><span>📱</span> Uso de pantallas</div>
+      <div class="fields-grid">
+        <div class="field-group">
+          <label>Horas de móvil</label>
+          <div class="slider-wrap">
+            <input type="range" id="h_movil" min="0" max="14" step="0.5" value="4" oninput="syncSlider(this,'h_movil_val')">
+            <span class="slider-val" id="h_movil_val">4</span>
+          </div>
+          <div class="hint">horas al día</div>
+        </div>
+        <div class="field-group">
+          <label>Tiempo total en pantalla</label>
+          <div class="slider-wrap">
+            <input type="range" id="t_pantalla" min="0" max="16" step="0.5" value="6" oninput="syncSlider(this,'t_pantalla_val')">
+            <span class="slider-val" id="t_pantalla_val">6</span>
+          </div>
+          <div class="hint">horas al día</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EJERCICIO -->
+    <div class="section">
+      <div class="section-title"><span>🏃</span> Actividad física</div>
+      <div class="fields-grid">
+        <div class="field-group">
+          <label>Pasos diarios</label>
+          <input type="number" id="pasos" min="0" max="30000" placeholder="7000" step="100">
+        </div>
+        <div class="field-group">
+          <label>Intensidad del ejercicio</label>
+          <div class="slider-wrap">
+            <input type="range" id="i_ejercicio" min="1" max="10" step="0.5" value="5" oninput="syncSlider(this,'i_ejercicio_val')">
+            <span class="slider-val" id="i_ejercicio_val">5</span>
+          </div>
+          <div class="hint">1 = muy suave · 10 = muy intenso</div>
+        </div>
+        <div class="field-group">
+          <label>Minutos de ejercicio</label>
+          <input type="number" id="m_ejercicio" min="0" max="300" placeholder="30">
+          <div class="hint">por día</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALIMENTACIÓN -->
+    <div class="section">
+      <div class="section-title"><span>🥗</span> Alimentación</div>
+      <div class="fields-grid">
+        <div class="field-group">
+          <label>Alimentos enteros</label>
+          <div class="slider-wrap">
+            <input type="range" id="alim_enteros" min="1" max="10" step="0.5" value="6" oninput="syncSlider(this,'alim_enteros_val')">
+            <span class="slider-val" id="alim_enteros_val">6</span>
+          </div>
+          <div class="hint">1 = casi ninguno · 10 = siempre</div>
+        </div>
+        <div class="field-group">
+          <label>Alimentos procesados</label>
+          <div class="slider-wrap">
+            <input type="range" id="alim_procesados" min="1" max="10" step="0.5" value="4" oninput="syncSlider(this,'alim_procesados_val')">
+            <span class="slider-val" id="alim_procesados_val">4</span>
+          </div>
+          <div class="hint">1 = casi ninguno · 10 = muy frecuente</div>
+        </div>
+        <div class="field-group">
+          <label>Proteína</label>
+          <input type="number" id="g_proteina" min="10" max="300" placeholder="80">
+          <div class="hint">gramos al día</div>
+        </div>
+        <div class="field-group">
+          <label>Fibra</label>
+          <input type="number" id="g_fibra" min="5" max="100" placeholder="25">
+          <div class="hint">gramos al día</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HÁBITOS -->
+    <div class="section">
+      <div class="section-title"><span>☀️</span> Hábitos y estilo de vida</div>
+      <div class="fields-grid">
+        <div class="field-group">
+          <label>Socialización</label>
+          <div class="slider-wrap">
+            <input type="range" id="h_social" min="0" max="12" step="0.5" value="3" oninput="syncSlider(this,'h_social_val')">
+            <span class="slider-val" id="h_social_val">3</span>
+          </div>
+          <div class="hint">horas al día</div>
+        </div>
+        <div class="field-group">
+          <label>Exposición al sol</label>
+          <div class="slider-wrap">
+            <input type="range" id="h_sol" min="0" max="10" step="0.5" value="1.5" oninput="syncSlider(this,'h_sol_val')">
+            <span class="slider-val" id="h_sol_val">1.5</span>
+          </div>
+          <div class="hint">horas al día</div>
+        </div>
+        <div class="field-group">
+          <label>Agua</label>
+          <div class="slider-wrap">
+            <input type="range" id="l_agua" min="0.5" max="5" step="0.1" value="2" oninput="syncSlider(this,'l_agua_val')">
+            <span class="slider-val" id="l_agua_val">2</span>
+          </div>
+          <div class="hint">litros al día</div>
+        </div>
+        <div class="field-group">
+          <label>Alcohol</label>
+          <div class="slider-wrap">
+            <input type="range" id="n_alcohol" min="0" max="10" step="0.5" value="2" oninput="syncSlider(this,'n_alcohol_val')">
+            <span class="slider-val" id="n_alcohol_val">2</span>
+          </div>
+          <div class="hint">0 = nada · 10 = muy frecuente</div>
+        </div>
+        <div class="field-group">
+          <label>Meditación</label>
+          <input type="number" id="t_meditacion" min="0" max="120" placeholder="10">
+          <div class="hint">minutos al día</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <button class="btn-submit" id="btn-submit" onclick="submitEncuesta()">
+        <span>🔮</span> Obtener mi predicción
+      </button>
+      <div class="error-msg" id="form-error"></div>
+    </div>
+
+  </form>
+</main>
+
+<script>
+  const token = localStorage.getItem('token');
+  if (!token) window.location.href = '/';
+  document.getElementById('header-username').textContent = localStorage.getItem('username') || '';
+
+  let modoDiario = false;
+  let perfilGuardado = null;
+
+  function logout() { localStorage.clear(); window.location.href = '/'; }
+  function syncSlider(el, valId) { document.getElementById(valId).textContent = el.value; updateProgress(); }
+
+  function calcBMI() {
+    const h = parseFloat(document.getElementById('altura').value);
+    const p = parseFloat(document.getElementById('peso').value);
+    if (h > 0 && p > 0) {
+      const bmi = p / Math.pow(h / 100, 2);
+      document.getElementById('bmi').value = bmi.toFixed(2);
+      document.getElementById('bmi-display').textContent = bmi.toFixed(1);
+      const labels = ['','Bajo peso','Peso normal','Sobrepeso','Obesidad'];
+      const idx = bmi < 18.5 ? 1 : bmi < 25 ? 2 : bmi < 30 ? 3 : 4;
+      document.getElementById('bmi-label').textContent = labels[idx];
+    }
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const campos = modoDiario
+      ? ['pasos','g_proteina','g_fibra','m_ejercicio','t_meditacion']
+      : ['edad','altura','peso','pasos','g_proteina','g_fibra','m_ejercicio','t_meditacion'];
+    const filled = campos.filter(id => {
+      const el = document.getElementById(id);
+      return el && el.value && parseFloat(el.value) >= 0;
+    }).length;
+    document.getElementById('progress').style.width = (filled / campos.length * 100) + '%';
+  }
+
+  function activarModoCompleto() {
+    // Permitir editar perfil aunque sea usuario recurrente
+    modoDiario = false;
+    document.getElementById('seccion-personal').style.display = 'block';
+    document.getElementById('perfil-card').style.display = 'none';
+
+    // Pre-rellenar con datos guardados
+    if (perfilGuardado) {
+      document.getElementById('edad').value   = perfilGuardado.edad;
+      document.getElementById('sexo').value   = perfilGuardado.sexo;
+      document.getElementById('altura').value = perfilGuardado.altura;
+      document.getElementById('peso').value   = perfilGuardado.peso;
+      calcBMI();
+    }
+
+    document.getElementById('survey-title').textContent    = 'Actualizar tu perfil';
+    document.getElementById('survey-subtitle').textContent = 'Modifica tus datos personales y los de hoy';
+  }
+
+  function renderPerfilCard(perfil) {
+    const sexoLabel = perfil.sexo == 1 ? 'Masculino' : 'Femenino';
+    const bmi = (perfil.peso / Math.pow(perfil.altura / 100, 2)).toFixed(1);
+    document.getElementById('perfil-info').innerHTML = `
+      <div class="perfil-dato"><span class="perfil-dato-label">Edad</span><span class="perfil-dato-val">${perfil.edad} años</span></div>
+      <div class="perfil-dato"><span class="perfil-dato-label">Sexo</span><span class="perfil-dato-val">${sexoLabel}</span></div>
+      <div class="perfil-dato"><span class="perfil-dato-label">Altura</span><span class="perfil-dato-val">${perfil.altura} cm</span></div>
+      <div class="perfil-dato"><span class="perfil-dato-label">Peso</span><span class="perfil-dato-val">${perfil.peso} kg</span></div>
+      <div class="perfil-dato"><span class="perfil-dato-label">IMC</span><span class="perfil-dato-val">${bmi}</span></div>
+    `;
+    document.getElementById('perfil-card').style.display = 'flex';
+  }
+
+  async function init() {
+    try {
+      const res = await fetch('/perfil', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+
+      if (res.ok) {
+        const perfil = await res.json();
+        if (perfil) {
+          perfilGuardado = perfil;
+          modoDiario = true;
+
+          // Ocultar sección de datos personales
+          document.getElementById('seccion-personal').style.display = 'none';
+          renderPerfilCard(perfil);
+
+          document.getElementById('survey-title').textContent    = '¿Cómo ha ido tu día?';
+          document.getElementById('survey-subtitle').textContent = 'Solo necesitamos los datos de hoy. Los personales ya los tenemos.';
+          document.getElementById('btn-submit').innerHTML = '<span>🔮</span> Predecir mi bienestar de hoy';
+        } else {
+          // Primera vez
+          document.getElementById('survey-title').textContent    = 'Cuéntanos sobre ti';
+          document.getElementById('survey-subtitle').textContent = 'Completa esta encuesta para obtener tu primera predicción personalizada';
+        }
+      }
+    } catch(e) {
+      document.getElementById('survey-title').textContent = 'Cuéntanos sobre ti';
+    }
+    updateProgress();
+  }
+
+  async function submitEncuesta() {
+    const btn = document.getElementById('btn-submit');
+    const err = document.getElementById('form-error');
+    err.classList.remove('show');
+
+    // Campos del día (siempre requeridos)
+    const camposDia = {
+      h_sueno:         parseFloat(document.getElementById('h_sueno').value),
+      c_sueno:         parseFloat(document.getElementById('c_sueno').value),
+      n_estres:        parseFloat(document.getElementById('n_estres').value),
+      h_movil:         parseFloat(document.getElementById('h_movil').value),
+      t_pantalla:      parseFloat(document.getElementById('t_pantalla').value),
+      pasos:           parseFloat(document.getElementById('pasos').value),
+      i_ejercicio:     parseFloat(document.getElementById('i_ejercicio').value),
+      m_ejercicio:     parseFloat(document.getElementById('m_ejercicio').value),
+      alim_enteros:    parseFloat(document.getElementById('alim_enteros').value),
+      alim_procesados: parseFloat(document.getElementById('alim_procesados').value),
+      g_proteina:      parseFloat(document.getElementById('g_proteina').value),
+      g_fibra:         parseFloat(document.getElementById('g_fibra').value),
+      h_social:        parseFloat(document.getElementById('h_social').value),
+      h_sol:           parseFloat(document.getElementById('h_sol').value),
+      l_agua:          parseFloat(document.getElementById('l_agua').value),
+      n_alcohol:       parseFloat(document.getElementById('n_alcohol').value),
+      t_meditacion:    parseFloat(document.getElementById('t_meditacion').value),
+    };
+
+    let body, endpoint;
+
+    if (modoDiario) {
+      // Solo enviar datos del día — el backend añade el perfil
+      body     = camposDia;
+      endpoint = '/encuesta-diaria';
+    } else {
+      // Encuesta completa
+      const edad   = parseFloat(document.getElementById('edad').value);
+      const sexo   = parseFloat(document.getElementById('sexo').value);
+      const altura = parseFloat(document.getElementById('altura').value);
+      const peso   = parseFloat(document.getElementById('peso').value);
+      const bmi    = parseFloat(document.getElementById('bmi').value);
+
+      if (isNaN(edad) || isNaN(altura) || isNaN(peso)) {
+        err.textContent = 'Por favor completa los datos personales';
+        err.classList.add('show'); return;
+      }
+
+      body     = { edad, sexo, altura, bmi, peso, ...camposDia };
+      endpoint = '/encuesta';
+    }
+
+    // Validar que los numéricos no sean NaN
+    const missing = Object.values(body).filter(v => isNaN(v));
+    if (missing.length) {
+      err.textContent = 'Por favor completa todos los campos numéricos';
+      err.classList.add('show'); return;
+    }
+
+    btn.disabled = true; btn.textContent = '⏳ Analizando...';
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Error al procesar');
+
+      localStorage.setItem('last_encuesta_id',  data.encuesta_id);
+      localStorage.setItem('last_pred_fisico',   data.prediccion.bienestar_fisico);
+      localStorage.setItem('last_pred_mental',   data.prediccion.bienestar_mental);
+      window.location.href = '/resultado';
+    } catch(e) {
+      err.textContent = e.message;
+      err.classList.add('show');
+      btn.disabled = false;
+      btn.innerHTML = '<span>🔮</span> Obtener mi predicción';
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>

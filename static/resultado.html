@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wellness — Tu resultado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0d1a0f;
+    --surface:   #141f16;
+    --surface2:  #1a2b1d;
+    --border:    #1e3022;
+    --green:     #4ade80;
+    --green-dim: #22c55e;
+    --mint:      #bbf7d0;
+    --blue:      #60a5fa;
+    --text:      #e8f5e9;
+    --muted:     #6b8f72;
+    --error:     #f87171;
+    --gold:      #fbbf24;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 30% 20%, rgba(74,222,128,.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 70% 80%, rgba(96,165,250,.05) 0%, transparent 50%);
+    pointer-events:none;
+  }
+
+  header {
+    position:sticky; top:0; z-index:100;
+    background: rgba(13,26,15,.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 2rem;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .header-brand { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--mint); }
+  .header-nav { display:flex; gap:.75rem; align-items:center; }
+  .nav-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius:8px;
+    color:var(--muted);
+    padding:.4rem .9rem;
+    font-size:.82rem;
+    cursor:pointer;
+    transition:all .2s;
+    font-family:'DM Sans',sans-serif;
+    text-decoration:none;
+    display:inline-block;
+  }
+  .nav-btn:hover { color:var(--text); border-color:var(--muted); }
+  .nav-btn.primary { background:rgba(74,222,128,.1); border-color:var(--green-dim); color:var(--green); }
+  .nav-btn.primary:hover { background:rgba(74,222,128,.2); }
+
+  main { max-width:680px; margin:0 auto; padding:3rem 1.5rem 5rem; }
+
+  /* Hero resultado */
+  .result-hero {
+    text-align:center;
+    margin-bottom:3rem;
+    animation: fadeUp .6s ease both;
+  }
+  .result-hero h2 {
+    font-family:'Playfair Display',serif;
+    font-size:1.9rem;
+    color:var(--mint);
+    margin-bottom:.4rem;
+  }
+  .result-hero p { color:var(--muted); font-weight:300; }
+
+  /* Score cards */
+  .scores-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1.25rem;
+    margin-bottom:2.5rem;
+  }
+  @media(max-width:500px){ .scores-grid{ grid-template-columns:1fr; } }
+
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius:20px;
+    padding:2rem 1.5rem;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+    animation: fadeUp .6s ease both;
+  }
+  .score-card:nth-child(2){ animation-delay:.1s; }
+
+  .score-card::before {
+    content:'';
+    position:absolute;
+    top:0; left:0; right:0;
+    height:3px;
+  }
+  .score-card.fisico::before { background:linear-gradient(90deg,#4ade80,#16a34a); }
+  .score-card.mental::before { background:linear-gradient(90deg,#60a5fa,#2563eb); }
+
+  .score-icon { font-size:2rem; margin-bottom:.75rem; }
+
+  .score-label {
+    font-size:.75rem;
+    font-weight:500;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--muted);
+    margin-bottom:.5rem;
+  }
+
+  .score-number {
+    font-family:'Playfair Display',serif;
+    font-size:3.5rem;
+    font-weight:600;
+    line-height:1;
+    margin-bottom:.25rem;
+  }
+  .score-card.fisico .score-number { color:var(--green); }
+  .score-card.mental .score-number  { color:var(--blue); }
+
+  .score-total { font-size:1rem; color:var(--muted); }
+
+  /* Ring progress */
+  .score-ring { margin:0 auto .75rem; display:block; }
+
+  /* Interpretación */
+  .score-badge {
+    display:inline-block;
+    padding:.2rem .75rem;
+    border-radius:20px;
+    font-size:.78rem;
+    font-weight:500;
+    margin-top:.5rem;
+  }
+
+  /* Feedback section */
+  .feedback-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius:20px;
+    padding:2rem;
+    margin-bottom:1.5rem;
+    animation: fadeUp .6s ease both;
+    animation-delay:.2s;
+  }
+
+  .feedback-section h3 {
+    font-family:'Playfair Display',serif;
+    font-size:1.25rem;
+    color:var(--mint);
+    margin-bottom:.4rem;
+  }
+  .feedback-section .subtitle {
+    font-size:.875rem;
+    color:var(--muted);
+    margin-bottom:1.75rem;
+    font-weight:300;
+  }
+
+  .feedback-sliders { display:grid; gap:1.25rem; }
+
+  .fb-field {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius:12px;
+    padding:1.1rem 1.25rem;
+  }
+
+  .fb-field-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:.75rem;
+  }
+
+  .fb-field-label {
+    font-size:.8rem;
+    font-weight:500;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--muted);
+  }
+
+  .fb-field-val {
+    font-size:1.1rem;
+    font-weight:600;
+  }
+  .fb-field.fisico .fb-field-val { color:var(--green); }
+  .fb-field.mental .fb-field-val { color:var(--blue); }
+
+  input[type="range"] {
+    width:100%;
+    height:5px;
+    -webkit-appearance:none;
+    border-radius:3px;
+    cursor:pointer;
+    outline:none;
+  }
+  .fb-field.fisico input[type="range"] {
+    background: linear-gradient(90deg, var(--green-dim) var(--pct,50%), var(--border) var(--pct,50%));
+  }
+  .fb-field.mental input[type="range"] {
+    background: linear-gradient(90deg, var(--blue) var(--pct,50%), var(--border) var(--pct,50%));
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance:none;
+    width:18px; height:18px;
+    border-radius:50%;
+    box-shadow:0 2px 8px rgba(0,0,0,.4);
+  }
+  .fb-field.fisico input[type="range"]::-webkit-slider-thumb { background:var(--green); }
+  .fb-field.mental input[type="range"]::-webkit-slider-thumb { background:var(--blue); }
+
+  .fb-hint {
+    display:flex;
+    justify-content:space-between;
+    font-size:.7rem;
+    color:var(--muted);
+    margin-top:.35rem;
+    opacity:.6;
+  }
+
+  .btn-feedback {
+    width:100%;
+    padding:.9rem;
+    margin-top:1.5rem;
+    background:linear-gradient(135deg,#4ade80,#16a34a);
+    border:none;
+    border-radius:10px;
+    color:#0d1a0f;
+    font-family:'DM Sans',sans-serif;
+    font-size:.95rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:transform .15s, box-shadow .15s;
+    display:flex; align-items:center; justify-content:center; gap:.5rem;
+  }
+  .btn-feedback:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(74,222,128,.3); }
+  .btn-feedback:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+  .success-msg {
+    background:rgba(74,222,128,.1);
+    border:1px solid rgba(74,222,128,.3);
+    border-radius:8px;
+    padding:.75rem 1rem;
+    color:var(--green);
+    font-size:.875rem;
+    margin-top:1rem;
+    display:none;
+    text-align:center;
+  }
+  .success-msg.show { display:block; animation:fadeUp .3s ease; }
+
+  .error-msg {
+    background:rgba(248,113,113,.1);
+    border:1px solid rgba(248,113,113,.3);
+    border-radius:8px;
+    padding:.75rem 1rem;
+    color:var(--error);
+    font-size:.85rem;
+    margin-top:1rem;
+    display:none;
+  }
+  .error-msg.show { display:block; }
+
+  /* Actions */
+  .actions {
+    display:flex; gap:1rem;
+    animation:fadeUp .6s ease both;
+    animation-delay:.3s;
+  }
+  .actions a {
+    flex:1;
+    text-align:center;
+    padding:.85rem;
+    border-radius:10px;
+    font-size:.9rem;
+    font-weight:500;
+    text-decoration:none;
+    transition:all .2s;
+    border: 1px solid var(--border);
+    color:var(--muted);
+  }
+  .actions a:hover { color:var(--text); border-color:var(--muted); }
+  .actions a.primary {
+    background:rgba(74,222,128,.08);
+    border-color:var(--green-dim);
+    color:var(--green);
+  }
+  .actions a.primary:hover { background:rgba(74,222,128,.15); }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* Interpretación visual */
+  .interp-bar {
+    height:6px;
+    background:var(--border);
+    border-radius:3px;
+    margin-top:1rem;
+    overflow:hidden;
+  }
+  .interp-fill {
+    height:100%;
+    border-radius:3px;
+    transition:width 1s cubic-bezier(.4,0,.2,1);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">🌿 Wellness</div>
+  <div class="header-nav">
+    <span id="header-username" style="font-size:.85rem;color:var(--muted)"></span>
+    <a href="/dashboard" class="nav-btn primary">Mi historial</a>
+    <button class="nav-btn" onclick="logout()">Salir</button>
+  </div>
+</header>
+
+<main>
+  <div class="result-hero">
+    <h2 id="hero-title">Tu predicción de bienestar</h2>
+    <p>Basada en tus hábitos actuales</p>
+  </div>
+
+  <div class="scores-grid">
+    <div class="score-card fisico">
+      <div class="score-icon">💪</div>
+      <div class="score-label">Bienestar Físico</div>
+      <div class="score-number" id="score-fisico">—</div>
+      <div class="score-total">/ 100</div>
+      <div class="interp-bar"><div class="interp-fill" id="bar-fisico" style="background:linear-gradient(90deg,#4ade80,#16a34a)"></div></div>
+      <div class="score-badge" id="badge-fisico"></div>
+    </div>
+    <div class="score-card mental">
+      <div class="score-icon">🧠</div>
+      <div class="score-label">Bienestar Mental</div>
+      <div class="score-number" id="score-mental">—</div>
+      <div class="score-total">/ 100</div>
+      <div class="interp-bar"><div class="interp-fill" id="bar-mental" style="background:linear-gradient(90deg,#60a5fa,#2563eb)"></div></div>
+      <div class="score-badge" id="badge-mental"></div>
+    </div>
+  </div>
+
+  <!-- Feedback -->
+  <div class="feedback-section" id="feedback-section">
+    <h3>¿Cómo te sientes realmente?</h3>
+    <p class="subtitle">Tu valoración ayuda a personalizar el modelo para ti. Cuanto más feedback des, más preciso será.</p>
+
+    <div class="feedback-sliders">
+      <div class="fb-field fisico">
+        <div class="fb-field-header">
+          <span class="fb-field-label">💪 Bienestar Físico real</span>
+          <span class="fb-field-val" id="fb-fisico-val">50</span>
+        </div>
+        <input type="range" id="fb-fisico" min="0" max="100" value="50"
+          oninput="syncFbSlider(this,'fb-fisico-val',true)">
+        <div class="fb-hint"><span>Muy bajo</span><span>Muy alto</span></div>
+      </div>
+
+      <div class="fb-field mental">
+        <div class="fb-field-header">
+          <span class="fb-field-label">🧠 Bienestar Mental real</span>
+          <span class="fb-field-val" id="fb-mental-val">50</span>
+        </div>
+        <input type="range" id="fb-mental" min="0" max="100" value="50"
+          oninput="syncFbSlider(this,'fb-mental-val',false)">
+        <div class="fb-hint"><span>Muy bajo</span><span>Muy alto</span></div>
+      </div>
+    </div>
+
+    <button class="btn-feedback" id="btn-feedback" onclick="submitFeedback()">
+      <span>✨</span> Enviar feedback y mejorar mi modelo
+    </button>
+    <div class="success-msg" id="success-msg">
+      ✅ Feedback guardado. Tu modelo personal se ha actualizado.
+    </div>
+    <div class="error-msg" id="fb-error"></div>
+  </div>
+
+  <div class="actions">
+    <a href="/encuesta">📋 Nueva encuesta</a>
+    <a href="/dashboard" class="primary">📊 Ver historial</a>
+  </div>
+</main>
+
+<script>
+  const token = localStorage.getItem('token');
+  if (!token) window.location.href = '/';
+  document.getElementById('header-username').textContent = localStorage.getItem('username') || '';
+
+  function logout() { localStorage.clear(); window.location.href = '/'; }
+
+  // Leer predicción guardada
+  const predFisico = parseFloat(localStorage.getItem('last_pred_fisico') || '0');
+  const predMental = parseFloat(localStorage.getItem('last_pred_mental') || '0');
+  const encuestaId = localStorage.getItem('last_encuesta_id');
+
+  function interpretScore(val) {
+    if (val >= 80) return { label: 'Excelente', color: '#4ade80' };
+    if (val >= 65) return { label: 'Bueno', color: '#86efac' };
+    if (val >= 50) return { label: 'Regular', color: '#fbbf24' };
+    if (val >= 35) return { label: 'Bajo', color: '#fb923c' };
+    return { label: 'Muy bajo', color: '#f87171' };
+  }
+
+  function renderScores() {
+    document.getElementById('score-fisico').textContent = predFisico.toFixed(1);
+    document.getElementById('score-mental').textContent  = predMental.toFixed(1);
+
+    const iFis = interpretScore(predFisico);
+    const iMen = interpretScore(predMental);
+
+    document.getElementById('badge-fisico').textContent     = iFis.label;
+    document.getElementById('badge-fisico').style.cssText   = `background:${iFis.color}22;color:${iFis.color};border:1px solid ${iFis.color}44`;
+    document.getElementById('badge-mental').textContent     = iMen.label;
+    document.getElementById('badge-mental').style.cssText   = `background:${iMen.color}22;color:${iMen.color};border:1px solid ${iMen.color}44`;
+
+    // Inicializar sliders de feedback en los valores predichos
+    const fbF = document.getElementById('fb-fisico');
+    const fbM = document.getElementById('fb-mental');
+    fbF.value = predFisico;
+    fbM.value = predMental;
+    document.getElementById('fb-fisico-val').textContent = predFisico.toFixed(0);
+    document.getElementById('fb-mental-val').textContent  = predMental.toFixed(0);
+    updateSliderBg(fbF, true);
+    updateSliderBg(fbM, false);
+
+    // Animar barras con delay
+    setTimeout(() => {
+      document.getElementById('bar-fisico').style.width = predFisico + '%';
+      document.getElementById('bar-mental').style.width  = predMental + '%';
+    }, 300);
+  }
+
+  function updateSliderBg(el, isFisico) {
+    const pct = ((el.value - el.min) / (el.max - el.min) * 100).toFixed(1);
+    el.style.setProperty('--pct', pct + '%');
+  }
+
+  function syncFbSlider(el, valId, isFisico) {
+    document.getElementById(valId).textContent = parseFloat(el.value).toFixed(0);
+    updateSliderBg(el, isFisico);
+  }
+
+  async function submitFeedback() {
+    const btn    = document.getElementById('btn-feedback');
+    const err    = document.getElementById('fb-error');
+    const ok     = document.getElementById('success-msg');
+    err.classList.remove('show');
+    ok.classList.remove('show');
+
+    if (!encuestaId) {
+      err.textContent = 'No se encontró la encuesta asociada';
+      err.classList.add('show'); return;
+    }
+
+    btn.disabled = true; btn.innerHTML = '⏳ Guardando y reentrenando...';
+
+    try {
+      const res = await fetch('/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+          encuesta_id: parseInt(encuestaId),
+          real_fisico: parseFloat(document.getElementById('fb-fisico').value),
+          real_mental:  parseFloat(document.getElementById('fb-mental').value),
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Error');
+      ok.classList.add('show');
+      btn.innerHTML = '✅ Feedback guardado';
+    } catch(e) {
+      err.textContent = e.message;
+      err.classList.add('show');
+      btn.disabled = false;
+      btn.innerHTML = '<span>✨</span> Enviar feedback y mejorar mi modelo';
+    }
+  }
+
+  renderScores();
+</script>
+</body>
+</html>

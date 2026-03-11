@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wellness — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d1a0f; --surface:#141f16; --surface2:#1a2b1d;
+    --border:#1e3022; --green:#4ade80; --green-dim:#22c55e;
+    --mint:#bbf7d0; --blue:#60a5fa; --orange:#fb923c;
+    --text:#e8f5e9; --muted:#6b8f72; --error:#f87171; --gold:#fbbf24;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%, rgba(74,222,128,.05) 0%, transparent 60%);
+    pointer-events:none;
+  }
+
+  header {
+    position:sticky; top:0; z-index:100;
+    background:rgba(13,26,15,.88); backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+    padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between;
+  }
+  .header-brand { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--mint); }
+  .header-nav { display:flex; gap:.75rem; align-items:center; }
+  .nav-btn {
+    background:none; border:1px solid var(--border); border-radius:8px;
+    color:var(--muted); padding:.4rem .9rem; font-size:.82rem; cursor:pointer;
+    transition:all .2s; font-family:'DM Sans',sans-serif; text-decoration:none; display:inline-block;
+  }
+  .nav-btn:hover { color:var(--text); border-color:var(--muted); }
+  .nav-btn.primary { background:rgba(74,222,128,.1); border-color:var(--green-dim); color:var(--green); }
+  .nav-btn.primary:hover { background:rgba(74,222,128,.2); }
+
+  /* Tabs */
+  .tabs-bar {
+    display:flex; gap:0;
+    border-bottom:1px solid var(--border);
+    padding:0 2rem;
+    background:rgba(13,26,15,.5);
+    position:sticky; top:57px; z-index:90;
+    backdrop-filter:blur(8px);
+  }
+  .tab-btn {
+    padding:.75rem 1.25rem; font-size:.85rem; font-weight:500;
+    color:var(--muted); background:none; border:none; cursor:pointer;
+    border-bottom:2px solid transparent; margin-bottom:-1px;
+    font-family:'DM Sans',sans-serif; transition:all .2s;
+  }
+  .tab-btn:hover { color:var(--text); }
+  .tab-btn.active { color:var(--green); border-bottom-color:var(--green); }
+
+  main { max-width:900px; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+
+  /* Panels */
+  .panel { display:none; }
+  .panel.active { display:block; animation:fadeUp .4s ease both; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  /* Section headers */
+  .section-head {
+    display:flex; align-items:baseline; gap:.75rem;
+    margin-bottom:1.25rem; margin-top:2rem;
+  }
+  .section-head:first-child { margin-top:0; }
+  .section-head h3 {
+    font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--mint);
+  }
+  .section-head p { font-size:.82rem; color:var(--muted); font-weight:300; }
+
+  /* Stats grid */
+  .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1.5rem; }
+  @media(max-width:580px){ .stats-grid{ grid-template-columns:1fr 1fr; } }
+
+  .stat-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; padding:1.25rem;
+  }
+  .stat-label { font-size:.7rem; font-weight:500; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:.35rem; }
+  .stat-value { font-family:'Playfair Display',serif; font-size:1.9rem; color:var(--mint); line-height:1; }
+  .stat-sub { font-size:.72rem; color:var(--muted); margin-top:.2rem; }
+  .trend-up   { color:var(--green); }
+  .trend-down { color:var(--error); }
+
+  /* Canvas charts */
+  .chart-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:16px; padding:1.5rem; margin-bottom:1.25rem;
+  }
+  .chart-card h4 {
+    font-size:.82rem; font-weight:500; text-transform:uppercase;
+    letter-spacing:.07em; color:var(--muted); margin-bottom:1.25rem;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .chart-legend { display:flex; gap:1rem; font-size:.75rem; color:var(--muted); font-weight:400; text-transform:none; letter-spacing:0; }
+  .leg { display:flex; align-items:center; gap:.35rem; }
+  .leg-dot { width:8px; height:8px; border-radius:50%; }
+
+  canvas { display:block; width:100% !important; }
+
+  /* Model explanation box */
+  .explain-box {
+    background:var(--surface2); border:1px solid var(--border);
+    border-left:3px solid var(--green-dim);
+    border-radius:12px; padding:1.1rem 1.4rem;
+    margin-bottom:1.25rem; font-size:.875rem; line-height:1.6;
+  }
+  .explain-box strong { color:var(--mint); }
+  .explain-box .tag {
+    display:inline-block; padding:.15rem .55rem; border-radius:20px;
+    font-size:.72rem; font-weight:600; margin:0 .15rem;
+  }
+  .tag-green { background:rgba(74,222,128,.15); color:var(--green); }
+  .tag-blue  { background:rgba(96,165,250,.15);  color:var(--blue); }
+  .tag-gold  { background:rgba(251,191,36,.15);  color:var(--gold); }
+
+  /* Mejora badge */
+  .mejora-badge {
+    display:inline-flex; align-items:center; gap:.4rem;
+    padding:.35rem .9rem; border-radius:20px; font-size:.85rem; font-weight:600;
+  }
+  .mejora-badge.positiva { background:rgba(74,222,128,.15); color:var(--green); border:1px solid rgba(74,222,128,.3); }
+  .mejora-badge.negativa { background:rgba(248,113,113,.1);  color:var(--error); border:1px solid rgba(248,113,113,.3); }
+  .mejora-badge.neutral  { background:rgba(107,143,114,.1);  color:var(--muted); border:1px solid var(--border); }
+
+  /* Tabla detalle */
+  .table-wrap { overflow-x:auto; border-radius:12px; border:1px solid var(--border); }
+  table { width:100%; border-collapse:collapse; font-size:.83rem; }
+  thead tr { background:var(--surface2); }
+  th { padding:.65rem 1rem; text-align:left; font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:500; }
+  td { padding:.65rem 1rem; border-top:1px solid var(--border); }
+  tr:hover td { background:rgba(255,255,255,.02); }
+  .err-low  { color:var(--green); font-weight:600; }
+  .err-mid  { color:var(--gold); font-weight:600; }
+  .err-high { color:var(--error); font-weight:600; }
+
+  /* Historial encuestas */
+  .hist-item {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:1rem 1.4rem; margin-bottom:.6rem;
+    display:grid; grid-template-columns:auto 1fr auto; gap:1rem; align-items:center;
+    transition:border-color .2s;
+  }
+  .hist-item:hover { border-color:var(--muted); }
+  .hist-date { font-size:.78rem; color:var(--muted); white-space:nowrap; }
+  .hist-scores { display:flex; gap:1.5rem; flex-wrap:wrap; }
+  .h-score { display:flex; align-items:center; gap:.35rem; }
+  .h-val { font-weight:600; font-size:.9rem; }
+  .h-val.fis { color:var(--green); }
+  .h-val.men { color:var(--blue); }
+  .badge-fb  { background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.3); color:var(--green); }
+  .badge-nfb { background:rgba(107,143,114,.1); border:1px solid rgba(107,143,114,.2); color:var(--muted); }
+  .badge { display:inline-block; padding:.2rem .6rem; border-radius:20px; font-size:.72rem; font-weight:500; }
+
+  /* Empty */
+  .empty { text-align:center; padding:4rem 2rem; color:var(--muted); }
+  .empty-icon { font-size:3rem; margin-bottom:1rem; }
+  .empty h3 { font-family:'Playfair Display',serif; color:var(--mint); margin-bottom:.5rem; }
+  .empty p { font-size:.875rem; margin-bottom:1.5rem; font-weight:300; }
+  .btn-new {
+    display:inline-flex; align-items:center; gap:.5rem;
+    padding:.75rem 1.5rem; background:linear-gradient(135deg,#4ade80,#16a34a);
+    border:none; border-radius:10px; color:#0d1a0f;
+    font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:600;
+    cursor:pointer; text-decoration:none; transition:transform .15s,box-shadow .15s;
+  }
+  .btn-new:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(74,222,128,.3); }
+
+  .loading { text-align:center; padding:3rem; color:var(--muted); font-size:.9rem; }
+
+  /* Barra progreso de personalización */
+  .personal-bar-wrap { margin:1rem 0; }
+  .personal-bar-label { display:flex; justify-content:space-between; font-size:.78rem; color:var(--muted); margin-bottom:.4rem; }
+  .personal-bar-track { height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
+  .personal-bar-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,#22c55e,#4ade80); transition:width 1s cubic-bezier(.4,0,.2,1); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">🌿 Wellness</div>
+  <div class="header-nav">
+    <span id="header-username" style="font-size:.85rem;color:var(--muted)"></span>
+    <a href="/encuesta" class="nav-btn primary">+ Nueva encuesta</a>
+    <button class="nav-btn" onclick="logout()">Salir</button>
+  </div>
+</header>
+
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('resumen')">📊 Resumen</button>
+  <button class="tab-btn" onclick="switchTab('modelo')">🧠 Mi modelo</button>
+  <button class="tab-btn" onclick="switchTab('historial')">📋 Historial</button>
+</div>
+
+<main>
+
+  <!-- ═══════════════════════════════════════════════
+       TAB 1 — RESUMEN
+  ════════════════════════════════════════════════ -->
+  <div class="panel active" id="tab-resumen">
+    <div id="resumen-loading" class="loading">Cargando...</div>
+    <div id="resumen-content" style="display:none">
+
+      <div class="stats-grid" id="stats-grid"></div>
+
+      <div class="chart-card">
+        <h4>
+          Evolución de tus predicciones
+          <div class="chart-legend">
+            <div class="leg"><div class="leg-dot" style="background:#4ade80"></div>Físico</div>
+            <div class="leg"><div class="leg-dot" style="background:#60a5fa"></div>Mental</div>
+          </div>
+        </h4>
+        <canvas id="chart-evolucion" height="180"></canvas>
+      </div>
+
+    </div>
+    <div id="resumen-empty" style="display:none" class="empty">
+      <div class="empty-icon">🌱</div>
+      <h3>Aún sin datos</h3>
+      <p>Completa tu primera encuesta para ver tu bienestar</p>
+      <a href="/encuesta" class="btn-new">📋 Empezar</a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       TAB 2 — MI MODELO
+  ════════════════════════════════════════════════ -->
+  <div class="panel" id="tab-modelo">
+    <div id="modelo-loading" class="loading">Cargando métricas...</div>
+    <div id="modelo-content" style="display:none">
+
+      <!-- Explicación del proceso -->
+      <div class="explain-box">
+        <strong>¿Cómo funciona tu modelo personal?</strong><br>
+        Empezamos con un modelo entrenado sobre miles de personas
+        <span class="tag tag-blue">modelo base</span>.
+        Cada vez que das feedback, combinamos esos datos globales con los tuyos,
+        dando <span class="tag tag-gold">×5 más peso</span> a tus respuestas reales.
+        Con el tiempo, el modelo aprende tus particularidades y sus predicciones
+        se ajustan mejor a cómo te sientes tú, no a cómo se siente la media.
+      </div>
+
+      <!-- Nivel de personalización -->
+      <div class="chart-card">
+        <h4>Nivel de personalización</h4>
+        <div id="personal-nivel"></div>
+        <div class="personal-bar-wrap">
+          <div class="personal-bar-label">
+            <span>Modelo base (genérico)</span>
+            <span id="personal-pct-label">0%</span>
+            <span>Totalmente personalizado</span>
+          </div>
+          <div class="personal-bar-track">
+            <div class="personal-bar-fill" id="personal-bar" style="width:0%"></div>
+          </div>
+        </div>
+        <div id="personal-desc" style="font-size:.8rem;color:var(--muted);margin-top:.75rem;line-height:1.5"></div>
+      </div>
+
+      <!-- Métricas actuales -->
+      <div class="stats-grid" id="modelo-stats"></div>
+
+      <!-- Gráfico: error MAE a lo largo de los reentrenamientos -->
+      <div class="chart-card" id="chart-mae-card" style="display:none">
+        <h4>
+          Error medio del modelo en tus datos (MAE)
+          <div class="chart-legend">
+            <div class="leg"><div class="leg-dot" style="background:#4ade80"></div>Físico</div>
+            <div class="leg"><div class="leg-dot" style="background:#60a5fa"></div>Mental</div>
+            <div class="leg"><div class="leg-dot" style="background:#fb923c;opacity:.5"></div>Modelo base</div>
+          </div>
+        </h4>
+        <canvas id="chart-mae" height="180"></canvas>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:.75rem;line-height:1.5">
+          <strong style="color:var(--text)">MAE (Error Absoluto Medio)</strong> — cuántos puntos (de 0-100) se equivoca el modelo de media.
+          Un MAE de 5 significa que la predicción se desvía ±5 puntos del valor real.
+          Cuanto más baje esta curva, mejor se ajusta el modelo a ti.
+        </div>
+      </div>
+
+      <!-- Gráfico: predicción vs real -->
+      <div class="chart-card" id="chart-pvr-card" style="display:none">
+        <h4>
+          Predicción del modelo vs tu valoración real
+          <div class="chart-legend">
+            <div class="leg"><div class="leg-dot" style="background:#4ade80"></div>Físico pred.</div>
+            <div class="leg"><div class="leg-dot" style="background:#4ade80;opacity:.4"></div>Físico real</div>
+            <div class="leg"><div class="leg-dot" style="background:#60a5fa"></div>Mental pred.</div>
+            <div class="leg"><div class="leg-dot" style="background:#60a5fa;opacity:.4"></div>Mental real</div>
+          </div>
+        </h4>
+        <canvas id="chart-pvr" height="200"></canvas>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:.75rem;line-height:1.5">
+          Cuanto más se superpongan las líneas sólidas (predicción) y punteadas (real),
+          mejor está calibrado tu modelo personal. Al principio habrá diferencia;
+          con más feedbacks irán convergiendo.
+        </div>
+      </div>
+
+      <!-- Tabla detalle por sesión -->
+      <div id="tabla-detalle-wrap" style="display:none">
+        <div class="section-head">
+          <h3>Detalle por sesión de feedback</h3>
+          <p>Error individual en cada punto</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Real físico</th>
+                <th>Pred. físico</th>
+                <th>Error fís.</th>
+                <th>Real mental</th>
+                <th>Pred. mental</th>
+                <th>Error men.</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-detalle"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    <div id="modelo-empty" style="display:none" class="empty">
+      <div class="empty-icon">🤖</div>
+      <h3>Sin datos de entrenamiento aún</h3>
+      <p>Da feedback en al menos una predicción para ver cómo evoluciona tu modelo</p>
+      <a href="/encuesta" class="btn-new">📋 Hacer una encuesta</a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       TAB 3 — HISTORIAL
+  ════════════════════════════════════════════════ -->
+  <div class="panel" id="tab-historial">
+    <div id="hist-loading" class="loading">Cargando historial...</div>
+    <div id="hist-list"></div>
+  </div>
+
+</main>
+
+<script>
+  const token = localStorage.getItem('token');
+  if (!token) window.location.href = '/';
+  document.getElementById('header-username').textContent = localStorage.getItem('username') || '';
+
+  function logout() { localStorage.clear(); window.location.href = '/'; }
+
+  // ── Tabs ────────────────────────────────────────
+  const tabs = ['resumen','modelo','historial'];
+  function switchTab(id) {
+    tabs.forEach(t => {
+      document.getElementById('tab-'+t).classList.toggle('active', t===id);
+      document.querySelectorAll('.tab-btn').forEach((b,i) =>
+        b.classList.toggle('active', tabs[i]===id)
+      );
+    });
+    if (id==='modelo' && !window._modeloLoaded) loadModelo();
+    if (id==='historial' && !window._histLoaded) loadHistorial();
+  }
+
+  // ── Helpers canvas ──────────────────────────────
+  function setupCanvas(id, height) {
+    const c = document.getElementById(id);
+    const W = c.parentElement.clientWidth - 48;
+    const H = height;
+    c.width  = W * devicePixelRatio;
+    c.height = H * devicePixelRatio;
+    c.style.width  = W + 'px';
+    c.style.height = H + 'px';
+    const ctx = c.getContext('2d');
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+    return { ctx, W, H };
+  }
+
+  function drawGrid(ctx, W, H, pad, yMin, yMax, steps=5) {
+    ctx.strokeStyle = '#1e3022';
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#6b8f72';
+    ctx.font = '10px DM Sans';
+    ctx.textAlign = 'right';
+    for (let i=0; i<=steps; i++) {
+      const v = yMin + (yMax-yMin)*(i/steps);
+      const y = pad.t + (1 - (v-yMin)/(yMax-yMin)) * (H-pad.t-pad.b);
+      ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+      ctx.fillText(v.toFixed(1), pad.l-4, y+3);
+    }
+  }
+
+  function drawLineArea(ctx, xs, ys, W, H, pad, yMin, yMax, color, dashed=false) {
+    const toY = v => pad.t + (1-(v-yMin)/(yMax-yMin))*(H-pad.t-pad.b);
+    if (dashed) { ctx.setLineDash([4,4]); } else { ctx.setLineDash([]); }
+
+    // Area
+    if (!dashed) {
+      const grad = ctx.createLinearGradient(0,pad.t,0,H-pad.b);
+      grad.addColorStop(0, color+'33'); grad.addColorStop(1, color+'00');
+      ctx.beginPath();
+      ctx.moveTo(xs[0], toY(ys[0]));
+      xs.forEach((x,i) => ctx.lineTo(x, toY(ys[i])));
+      ctx.lineTo(xs[xs.length-1], H-pad.b);
+      ctx.lineTo(xs[0], H-pad.b);
+      ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+    }
+
+    // Line
+    ctx.beginPath();
+    ctx.moveTo(xs[0], toY(ys[0]));
+    xs.forEach((x,i) => ctx.lineTo(x, toY(ys[i])));
+    ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Dots
+    if (!dashed) {
+      ys.forEach((v,i) => {
+        ctx.beginPath(); ctx.arc(xs[i],toY(v),4,0,Math.PI*2);
+        ctx.fillStyle=color; ctx.fill();
+      });
+    }
+  }
+
+  function xPositions(n, W, pad) {
+    if (n===1) return [pad.l + (W-pad.l-pad.r)/2];
+    return Array.from({length:n},(_,i)=>pad.l+(W-pad.l-pad.r)*(i/(n-1)));
+  }
+
+  // ── TAB 1: RESUMEN ──────────────────────────────
+  async function loadResumen() {
+    try {
+      const [histRes] = await Promise.all([
+        fetch('/historial',{headers:{'Authorization':'Bearer '+token}})
+      ]);
+      const hist = await histRes.json();
+
+      document.getElementById('resumen-loading').style.display='none';
+
+      if (!hist.length) {
+        document.getElementById('resumen-empty').style.display='block'; return;
+      }
+      document.getElementById('resumen-content').style.display='block';
+
+      // Stats
+      const avg = arr => arr.reduce((s,v)=>s+v,0)/arr.length;
+      const avgFis = avg(hist.map(d=>d.pred_fisico));
+      const avgMen = avg(hist.map(d=>d.pred_mental));
+      const conFb  = hist.filter(d=>d.real_fisico!==null).length;
+      const last   = hist[0], prev = hist[1];
+      const dF = prev ? last.pred_fisico-prev.pred_fisico : 0;
+      const dM = prev ? last.pred_mental-prev.pred_mental : 0;
+
+      document.getElementById('stats-grid').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-label">Encuestas</div>
+          <div class="stat-value">${hist.length}</div>
+          <div class="stat-sub">registradas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">💪 Físico promedio</div>
+          <div class="stat-value" style="color:var(--green)">${avgFis.toFixed(1)}</div>
+          <div class="stat-sub ${dF>0?'trend-up':dF<0?'trend-down':''}">${dF>0?'↑':dF<0?'↓':'→'} ${Math.abs(dF).toFixed(1)} vs anterior</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">🧠 Mental promedio</div>
+          <div class="stat-value" style="color:var(--blue)">${avgMen.toFixed(1)}</div>
+          <div class="stat-sub ${dM>0?'trend-up':dM<0?'trend-down':''}">${dM>0?'↑':dM<0?'↓':'→'} ${Math.abs(dM).toFixed(1)} vs anterior</div>
+        </div>
+      `;
+
+      // Gráfico evolución (cronológico)
+      if (hist.length >= 2) {
+        const rev = [...hist].reverse();
+        setTimeout(() => {
+          const {ctx,W,H} = setupCanvas('chart-evolucion',180);
+          const pad = {t:20,r:20,b:28,l:38};
+          const fisVals = rev.map(d=>d.pred_fisico);
+          const menVals = rev.map(d=>d.pred_mental);
+          const allVals = [...fisVals,...menVals];
+          const yMin = Math.max(0,Math.min(...allVals)-10);
+          const yMax = Math.min(100,Math.max(...allVals)+10);
+          ctx.clearRect(0,0,W,H);
+          drawGrid(ctx,W,H,pad,yMin,yMax,4);
+          const xs = xPositions(rev.length,W,pad);
+          drawLineArea(ctx,xs,fisVals,W,H,pad,yMin,yMax,'#4ade80');
+          drawLineArea(ctx,xs,menVals,W,H,pad,yMin,yMax,'#60a5fa');
+          // X labels
+          ctx.fillStyle='#6b8f72'; ctx.font='9px DM Sans'; ctx.textAlign='center';
+          rev.forEach((d,i)=>{
+            const dt = new Date(d.created_at);
+            ctx.fillText(`${dt.getDate()}/${dt.getMonth()+1}`,xs[i],H-4);
+          });
+        },60);
+      }
+
+    } catch(e) { console.error(e); }
+  }
+
+  // ── TAB 2: MODELO ───────────────────────────────
+  async function loadModelo() {
+    window._modeloLoaded = true;
+    try {
+      const res = await fetch('/metricas-modelo',{headers:{'Authorization':'Bearer '+token}});
+      const data = await res.json();
+      document.getElementById('modelo-loading').style.display='none';
+
+      const {historial_entrenamiento: hist, comparativa_pred_real: comp} = data;
+
+      if (!hist.length && !comp.length) {
+        document.getElementById('modelo-empty').style.display='block'; return;
+      }
+      document.getElementById('modelo-content').style.display='block';
+
+      const nFb = comp.length;
+      const lastH = hist[hist.length-1];
+
+      // ── Nivel de personalización ────────────────
+      // Satura al 100% con ~20 feedbacks
+      const pct = Math.min(100, Math.round((nFb / 20) * 100));
+      document.getElementById('personal-bar').style.width = pct+'%';
+      document.getElementById('personal-pct-label').textContent = pct+'%';
+
+      const nivel = pct < 15 ? 'Iniciando' : pct < 40 ? 'Aprendiendo' : pct < 70 ? 'Adaptándose' : 'Personalizado';
+      document.getElementById('personal-nivel').innerHTML =
+        `<div style="margin-bottom:.75rem">
+           <span class="mejora-badge ${pct>50?'positiva':'neutral'}">${nivel} — ${nFb} feedback${nFb!==1?'s':''}</span>
+         </div>`;
+
+      const descs = [
+        `Con ${nFb} feedback${nFb!==1?'s':''}, el modelo todavía se basa principalmente en patrones generales. Añade más valoraciones para que empiece a aprender tus particularidades.`,
+        `El modelo ya está empezando a reconocer tus patrones. Cada nuevo feedback tiene ${5}× más peso que un punto de datos genérico.`,
+        `Tu modelo está bien adaptado a ti. Las predicciones ya reflejan tus particularidades más que las de la población general.`,
+        `Tu modelo está altamente personalizado. Las predicciones se basan fundamentalmente en tu historial personal.`,
+      ];
+      const di = pct<15?0:pct<40?1:pct<70?2:3;
+      document.getElementById('personal-desc').textContent = descs[di];
+
+      // ── Stats actuales ──────────────────────────
+      const maeFis = lastH ? lastH.mae_fisico : '—';
+      const maeMen = lastH ? lastH.mae_mental : '—';
+      const mejora = lastH && lastH.mejora_pct !== null ? lastH.mejora_pct : null;
+      document.getElementById('modelo-stats').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-label">Feedbacks totales</div>
+          <div class="stat-value">${nFb}</div>
+          <div class="stat-sub">puntos de datos tuyos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">💪 Error en físico</div>
+          <div class="stat-value" style="color:var(--green);font-size:1.5rem">${maeFis !== '—' ? '±'+maeFis : '—'}</div>
+          <div class="stat-sub">puntos de media</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">🧠 Error en mental</div>
+          <div class="stat-value" style="color:var(--blue);font-size:1.5rem">${maeMen !== '—' ? '±'+maeMen : '—'}</div>
+          <div class="stat-sub">puntos de media</div>
+        </div>
+      `;
+
+      // ── Gráfico MAE a lo largo de reentrenamientos ──
+      if (hist.length >= 1) {
+        document.getElementById('chart-mae-card').style.display='block';
+        setTimeout(()=>{
+          const {ctx,W,H} = setupCanvas('chart-mae',180);
+          const pad={t:20,r:20,b:28,l:38};
+          const fisV = hist.map(d=>d.mae_fisico);
+          const menV = hist.map(d=>d.mae_mental);
+          const basF = hist.map(d=>d.pred_base_fisico).filter(v=>v!==null);
+          const allV = [...fisV,...menV,...basF].filter(v=>v!==null);
+          const yMin = 0;
+          const yMax = Math.max(20, Math.max(...allV)+5);
+          ctx.clearRect(0,0,W,H);
+          drawGrid(ctx,W,H,pad,yMin,yMax,4);
+          const xs = xPositions(hist.length,W,pad);
+          // Base (fondo, naranja semitransparente)
+          if (basF.length===hist.length) {
+            drawLineArea(ctx,xs,basF,W,H,pad,yMin,yMax,'#fb923c',true);
+          }
+          drawLineArea(ctx,xs,fisV,W,H,pad,yMin,yMax,'#4ade80');
+          drawLineArea(ctx,xs,menV,W,H,pad,yMin,yMax,'#60a5fa');
+          // Labels eje X: nº feedback
+          ctx.fillStyle='#6b8f72'; ctx.font='9px DM Sans'; ctx.textAlign='center';
+          hist.forEach((d,i)=>ctx.fillText('fb'+d.n_feedbacks,xs[i],H-4));
+        },60);
+      }
+
+      // ── Gráfico pred vs real ─────────────────────
+      if (comp.length >= 1) {
+        document.getElementById('chart-pvr-card').style.display='block';
+        setTimeout(()=>{
+          const {ctx,W,H} = setupCanvas('chart-pvr',200);
+          const pad={t:20,r:20,b:28,l:38};
+          const predF = comp.map(d=>d.pred_fisico);
+          const realF = comp.map(d=>d.real_fisico);
+          const predM = comp.map(d=>d.pred_mental);
+          const realM = comp.map(d=>d.real_mental);
+          const allV  = [...predF,...realF,...predM,...realM];
+          const yMin  = Math.max(0,Math.min(...allV)-8);
+          const yMax  = Math.min(100,Math.max(...allV)+8);
+          ctx.clearRect(0,0,W,H);
+          drawGrid(ctx,W,H,pad,yMin,yMax,4);
+          const xs = xPositions(comp.length,W,pad);
+          drawLineArea(ctx,xs,predF,W,H,pad,yMin,yMax,'#4ade80');
+          drawLineArea(ctx,xs,realF,W,H,pad,yMin,yMax,'#4ade80',true);
+          drawLineArea(ctx,xs,predM,W,H,pad,yMin,yMax,'#60a5fa');
+          drawLineArea(ctx,xs,realM,W,H,pad,yMin,yMax,'#60a5fa',true);
+          ctx.fillStyle='#6b8f72'; ctx.font='9px DM Sans'; ctx.textAlign='center';
+          comp.forEach((d,i)=>{
+            const dt = new Date(d.created_at);
+            ctx.fillText(`${dt.getDate()}/${dt.getMonth()+1}`,xs[i],H-4);
+          });
+        },60);
+
+        // Tabla detalle
+        document.getElementById('tabla-detalle-wrap').style.display='block';
+        document.getElementById('tabla-detalle').innerHTML = comp.map((d,i)=>{
+          const errF = Math.abs(d.pred_fisico - d.real_fisico).toFixed(1);
+          const errM = Math.abs(d.pred_mental  - d.real_mental).toFixed(1);
+          const cls  = v => parseFloat(v)<5?'err-low':parseFloat(v)<10?'err-mid':'err-high';
+          return `<tr>
+            <td style="color:var(--muted)">${i+1}</td>
+            <td>${d.real_fisico.toFixed(1)}</td>
+            <td style="color:var(--green)">${d.pred_fisico.toFixed(1)}</td>
+            <td class="${cls(errF)}">±${errF}</td>
+            <td>${d.real_mental.toFixed(1)}</td>
+            <td style="color:var(--blue)">${d.pred_mental.toFixed(1)}</td>
+            <td class="${cls(errM)}">±${errM}</td>
+          </tr>`;
+        }).join('');
+      }
+
+    } catch(e) { console.error(e); }
+  }
+
+  // ── TAB 3: HISTORIAL ────────────────────────────
+  async function loadHistorial() {
+    window._histLoaded = true;
+    try {
+      const res = await fetch('/historial',{headers:{'Authorization':'Bearer '+token}});
+      const hist = await res.json();
+      document.getElementById('hist-loading').style.display='none';
+
+      if (!hist.length) {
+        document.getElementById('hist-list').innerHTML=`
+          <div class="empty"><div class="empty-icon">📋</div>
+          <h3>Sin registros aún</h3>
+          <p>Haz tu primera encuesta</p>
+          <a href="/encuesta" class="btn-new">Empezar</a></div>`;
+        return;
+      }
+
+      const interp = v=>v>=80?'Excelente':v>=65?'Bueno':v>=50?'Regular':v>=35?'Bajo':'Muy bajo';
+      const fmtDate = s=>{
+        const d=new Date(s);
+        return d.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})
+               +' '+d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+      };
+
+      document.getElementById('hist-list').innerHTML = hist.map(d=>`
+        <div class="hist-item">
+          <div class="hist-date">${fmtDate(d.created_at)}</div>
+          <div class="hist-scores">
+            <div class="h-score">
+              <span style="font-size:.75rem;color:var(--muted)">💪</span>
+              <span class="h-val fis">${d.pred_fisico.toFixed(1)}</span>
+              <span style="font-size:.7rem;color:var(--muted)">(${interp(d.pred_fisico)})</span>
+            </div>
+            <div class="h-score">
+              <span style="font-size:.75rem;color:var(--muted)">🧠</span>
+              <span class="h-val men">${d.pred_mental.toFixed(1)}</span>
+              <span style="font-size:.7rem;color:var(--muted)">(${interp(d.pred_mental)})</span>
+            </div>
+            ${d.real_fisico!==null?`
+            <div class="h-score" style="opacity:.65">
+              <span style="font-size:.7rem;color:var(--muted)">Real:</span>
+              <span class="h-val fis" style="font-size:.82rem">${d.real_fisico.toFixed(0)}</span>
+              <span class="h-val men" style="font-size:.82rem">${d.real_mental.toFixed(0)}</span>
+            </div>`:''}
+          </div>
+          <span class="badge ${d.real_fisico!==null?'badge-fb':'badge-nfb'}">
+            ${d.real_fisico!==null?'✓ Con feedback':'Sin feedback'}
+          </span>
+        </div>
+      `).join('');
+
+    } catch(e) { console.error(e); }
+  }
+
+  loadResumen();
+</script>
+</body>
+</html>

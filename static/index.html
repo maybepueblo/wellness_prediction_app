@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wellness — Acceso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0d1a0f;
+    --surface:   #141f16;
+    --border:    #1e3022;
+    --green:     #4ade80;
+    --green-dim: #22c55e;
+    --mint:      #bbf7d0;
+    --text:      #e8f5e9;
+    --muted:     #6b8f72;
+    --error:     #f87171;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Fondo animado */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 80%, rgba(74,222,128,.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 20%, rgba(34,197,94,.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 420px;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+    animation: fadeUp .6s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .logo {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .logo-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #4ade80, #16a34a);
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 8px 32px rgba(74,222,128,.25);
+  }
+
+  .logo h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    color: var(--mint);
+  }
+
+  .logo p {
+    color: var(--muted);
+    font-size: .875rem;
+    margin-top: .25rem;
+    font-weight: 300;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 24px 64px rgba(0,0,0,.4);
+  }
+
+  .tabs {
+    display: flex;
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 1.75rem;
+  }
+
+  .tab {
+    flex: 1;
+    padding: .6rem;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: .875rem;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all .2s;
+    border: none;
+    background: none;
+  }
+
+  .tab.active {
+    background: var(--surface);
+    color: var(--green);
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: .5rem;
+  }
+
+  input {
+    width: 100%;
+    padding: .8rem 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem;
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+  }
+
+  input:focus {
+    border-color: var(--green-dim);
+    box-shadow: 0 0 0 3px rgba(74,222,128,.1);
+  }
+
+  .btn {
+    width: 100%;
+    padding: .9rem;
+    background: linear-gradient(135deg, #4ade80, #16a34a);
+    border: none;
+    border-radius: 10px;
+    color: #0d1a0f;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s, opacity .15s;
+    margin-top: .5rem;
+    letter-spacing: .01em;
+  }
+
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(74,222,128,.3); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+  .error-msg {
+    background: rgba(248,113,113,.1);
+    border: 1px solid rgba(248,113,113,.3);
+    border-radius: 8px;
+    padding: .75rem 1rem;
+    color: var(--error);
+    font-size: .85rem;
+    margin-top: 1rem;
+    display: none;
+  }
+
+  .error-msg.show { display: block; animation: fadeUp .3s ease; }
+
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeUp .3s ease; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="logo">
+    <div class="logo-icon">🌿</div>
+    <h1>Wellness</h1>
+    <p>Tu predictor de bienestar personalizado</p>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('login')">Iniciar sesión</button>
+      <button class="tab" onclick="switchTab('register')">Registrarse</button>
+    </div>
+
+    <!-- Login -->
+    <div class="panel active" id="panel-login">
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" id="login-user" placeholder="tu_usuario" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn" onclick="doLogin()">Entrar</button>
+      <div class="error-msg" id="login-error"></div>
+    </div>
+
+    <!-- Register -->
+    <div class="panel" id="panel-register">
+      <div class="form-group">
+        <label>Nombre de usuario</label>
+        <input type="text" id="reg-user" placeholder="min. 3 caracteres" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="reg-pass" placeholder="min. 6 caracteres" autocomplete="new-password">
+      </div>
+      <button class="btn" onclick="doRegister()">Crear cuenta</button>
+      <div class="error-msg" id="reg-error"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((t, i) =>
+      t.classList.toggle('active', (i === 0) === (tab === 'login'))
+    );
+    document.getElementById('panel-login').classList.toggle('active', tab === 'login');
+    document.getElementById('panel-register').classList.toggle('active', tab === 'register');
+  }
+
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+
+  function hideError(id) {
+    document.getElementById(id).classList.remove('show');
+  }
+
+  async function doLogin() {
+    hideError('login-error');
+    const username = document.getElementById('login-user').value.trim();
+    const password = document.getElementById('login-pass').value;
+    if (!username || !password) return showError('login-error', 'Completa todos los campos');
+
+    const btn = document.querySelector('#panel-login .btn');
+    btn.disabled = true; btn.textContent = 'Entrando...';
+
+    try {
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Error');
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username);
+      localStorage.setItem('user_id', data.user_id);
+
+      // Comprobar si es primera vez
+      const check = await fetch('/check-primera-vez', {
+        headers: { 'Authorization': 'Bearer ' + data.token }
+      });
+      const checkData = await check.json();
+      window.location.href = checkData.primera_vez ? '/encuesta' : '/dashboard';
+    } catch(e) {
+      showError('login-error', e.message);
+      btn.disabled = false; btn.textContent = 'Entrar';
+    }
+  }
+
+  async function doRegister() {
+    hideError('reg-error');
+    const username = document.getElementById('reg-user').value.trim();
+    const password = document.getElementById('reg-pass').value;
+    if (!username || !password) return showError('reg-error', 'Completa todos los campos');
+
+    const btn = document.querySelector('#panel-register .btn');
+    btn.disabled = true; btn.textContent = 'Creando cuenta...';
+
+    try {
+      const res = await fetch('/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Error');
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username);
+      localStorage.setItem('user_id', data.user_id);
+      window.location.href = '/encuesta';
+    } catch(e) {
+      showError('reg-error', e.message);
+      btn.disabled = false; btn.textContent = 'Crear cuenta';
+    }
+  }
+
+  // Enter para submit
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const active = document.querySelector('.panel.active').id;
+    if (active === 'panel-login') doLogin();
+    else doRegister();
+  });
+
+  // Si ya hay token válido, redirigir
+  if (localStorage.getItem('token')) {
+    fetch('/check-primera-vez', {
+      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+    }).then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d) window.location.href = d.primera_vez ? '/encuesta' : '/dashboard';
+      }).catch(() => {});
+  }
+</script>
+</body>
+</html>

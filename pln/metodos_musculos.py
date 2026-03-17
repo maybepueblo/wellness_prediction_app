@@ -160,3 +160,60 @@ def procesar_sesion(
     f_nueva, alertas = f_apply(f_prev, d_total, capacidad)
     return f_nueva, alertas, no_encontrados
  
+
+# lexicon personal pa guardar las marcas del user
+def cargar_lexicon_personal(ruta: str | Path) -> dict:
+    # carga el léxico personal, si no hay pos vacío
+    ruta = Path(ruta)
+    if not ruta.exists():
+        return {}
+    with open(ruta, encoding="utf-8") as f:
+        return json.load(f)
+ 
+ 
+def guardar_lexicon_personal(lexicon: dict, ruta: str | Path) -> None:
+    # guardarlo
+    with open(ruta, encoding="utf-8", mode="w") as f:
+        json.dump(lexicon, f, ensure_ascii=False, indent=2)
+ 
+ 
+def _es_mejor_marca(nuevo: dict, actual: dict) -> bool:
+    # true si el nuevo supera la marca que haya
+    # si es BW, gana mayor volumen
+    # con peso pues gana el mayor
+    if nuevo["es_bw"]:
+        return (nuevo["series"] * nuevo["reps"]) > (actual["series"] * actual["reps"])
+ 
+    peso_nuevo   = nuevo.get("peso_kg") or 0.0
+    peso_actual  = actual.get("peso_kg") or 0.0
+ 
+    if peso_nuevo != peso_actual:
+        return peso_nuevo > peso_actual
+ 
+    # Mismo peso — desempate por volumen
+    return (nuevo["series"] * nuevo["reps"]) > (actual["series"] * actual["reps"])
+ 
+ 
+def actualizar_lexicon_personal(
+    ejercicios: list[dict],
+    ruta:       str | Path,
+) -> dict:
+    # compara ejercicio de sesión con marca registrada y actualiza
+    lexicon = cargar_lexicon_personal(ruta)
+ 
+    for ej in ejercicios:
+        clave = _normalizar(ej["nombre"])
+ 
+        nuevo = {
+            "series":     ej["series"],
+            "reps":       ej["reps"],
+            "peso_kg":    ej.get("peso_kg"),
+            "es_bw":      ej.get("es_bw", False),
+            "updated_at": date.today().isoformat(),
+        }
+ 
+        if clave not in lexicon or _es_mejor_marca(nuevo, lexicon[clave]):
+            lexicon[clave] = nuevo
+ 
+    guardar_lexicon_personal(lexicon, ruta)
+    return lexicon

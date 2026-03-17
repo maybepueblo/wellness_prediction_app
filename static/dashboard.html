@@ -180,6 +180,145 @@
   .personal-bar-label { display:flex; justify-content:space-between; font-size:.78rem; color:var(--muted); margin-bottom:.4rem; }
   .personal-bar-track { height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
   .personal-bar-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,#22c55e,#4ade80); transition:width 1s cubic-bezier(.4,0,.2,1); }
+
+  /* ── Panel entrenamiento PLN ── */
+  .ent-layout { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; align-items:start; }
+  @media(max-width:640px){ .ent-layout{ grid-template-columns:1fr; } }
+
+  .ent-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:1.5rem; }
+  .ent-card h4 { font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:500; margin-bottom:1rem; }
+
+  .ent-textarea {
+    width:100%; height:200px;
+    background:var(--bg); border:1px solid var(--border); border-radius:10px;
+    color:var(--text); font-family:'DM Sans',sans-serif; font-size:.85rem;
+    line-height:1.7; padding:.85rem 1rem; resize:vertical; outline:none;
+    transition:border-color .2s;
+  }
+  .ent-textarea:focus { border-color:var(--green-dim); box-shadow:0 0 0 3px rgba(74,222,128,.08); }
+
+  .ent-hint { font-size:.75rem; color:var(--muted); margin-top:.6rem; line-height:1.5; }
+  .ent-hint code { color:var(--green); font-family:monospace; background:rgba(74,222,128,.08); padding:.1rem .35rem; border-radius:4px; }
+
+  .ent-row { display:flex; gap:.75rem; align-items:flex-end; margin-top:1rem; }
+  .ent-field { display:flex; flex-direction:column; gap:.35rem; }
+  .ent-field label { font-size:.72rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); font-weight:500; }
+  .ent-field input {
+    width:110px; padding:.6rem .85rem;
+    background:var(--bg); border:1px solid var(--border); border-radius:8px;
+    color:var(--text); font-family:'DM Sans',sans-serif; font-size:.88rem; outline:none;
+    transition:border-color .2s;
+  }
+  .ent-field input:focus { border-color:var(--green-dim); }
+
+  .ent-btn {
+    padding:.65rem 1.4rem; background:linear-gradient(135deg,#4ade80,#16a34a);
+    border:none; border-radius:8px; color:#0d1a0f;
+    font-family:'DM Sans',sans-serif; font-size:.88rem; font-weight:600;
+    cursor:pointer; transition:transform .15s, box-shadow .15s, opacity .15s;
+    white-space:nowrap;
+  }
+  .ent-btn:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(74,222,128,.3); }
+  .ent-btn:active { transform:translateY(0); }
+  .ent-btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+
+  /* Resultado: barras de desgaste */
+  .muscle-list { display:flex; flex-direction:column; gap:.55rem; }
+  .muscle-row { display:grid; grid-template-columns:148px 1fr 44px; align-items:center; gap:.75rem; }
+  .muscle-name { font-size:.78rem; color:var(--text); white-space:nowrap; }
+  .bar-track { height:5px; background:var(--border); border-radius:99px; overflow:hidden; }
+  .bar-fill { height:100%; border-radius:99px; transition:width .7s cubic-bezier(.16,1,.3,1); }
+  .bar-val { font-size:.72rem; color:var(--muted); text-align:right; font-family:monospace; }
+
+  /* NLP pills */
+  .nlp-list { display:flex; flex-direction:column; gap:.45rem; }
+  .nlp-row { display:flex; justify-content:space-between; align-items:center; gap:.75rem;
+             padding:.5rem .85rem; background:var(--bg); border-radius:8px; }
+  .nlp-nota { font-size:.76rem; color:var(--muted); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pf-pill { font-size:.72rem; font-weight:600; padding:.2rem .6rem; border-radius:99px; white-space:nowrap; font-family:monospace; }
+  .pf-low  { background:rgba(74,222,128,.12);  color:var(--green); }
+  .pf-mid  { background:rgba(251,191,36,.12);  color:var(--gold); }
+  .pf-high { background:rgba(248,113,113,.12); color:var(--error); }
+
+  .ent-alert {
+    background:rgba(248,113,113,.08); border:1px solid rgba(248,113,113,.25);
+    border-radius:8px; padding:.7rem 1rem; font-size:.8rem; color:var(--error); margin-top:.75rem;
+  }
+  .ent-warn {
+    background:rgba(251,191,36,.07); border:1px solid rgba(251,191,36,.2);
+    border-radius:8px; padding:.7rem 1rem; font-size:.8rem; color:var(--gold); margin-top:.75rem;
+  }
+  .ent-empty { text-align:center; padding:2.5rem 1rem; color:var(--muted); font-size:.85rem; }
+
+  /* ── Constructor de sesión ── */
+  .ej-builder { display:flex; flex-direction:column; gap:.75rem; }
+
+  .ej-card {
+    background:var(--bg); border:1px solid var(--border);
+    border-radius:12px; padding:1rem 1.25rem;
+    display:grid; gap:.75rem;
+  }
+  .ej-card-header {
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .ej-card-num {
+    font-size:.7rem; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--muted); font-weight:500;
+  }
+  .ej-remove {
+    background:none; border:none; color:var(--muted); cursor:pointer;
+    font-size:1rem; padding:.1rem .3rem; border-radius:4px;
+    transition:color .15s;
+  }
+  .ej-remove:hover { color:var(--error); }
+
+  .ej-fields {
+    display:grid;
+    grid-template-columns: 2fr 60px 60px 80px 60px;
+    gap:.5rem; align-items:end;
+  }
+  @media(max-width:640px){ .ej-fields{ grid-template-columns:1fr 1fr; } }
+
+  .ej-field { display:flex; flex-direction:column; gap:.3rem; }
+  .ej-field label {
+    font-size:.68rem; text-transform:uppercase; letter-spacing:.07em;
+    color:var(--muted); font-weight:500;
+  }
+  .ej-select, .ej-input {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:8px; color:var(--text);
+    font-family:'DM Sans',sans-serif; font-size:.85rem;
+    padding:.5rem .75rem; outline:none; width:100%;
+    transition:border-color .2s;
+  }
+  .ej-select:focus, .ej-input:focus {
+    border-color:var(--green-dim);
+    box-shadow:0 0 0 2px rgba(74,222,128,.08);
+  }
+  .ej-nota {
+    width:100%; background:var(--surface); border:1px solid var(--border);
+    border-radius:8px; color:var(--text); font-family:'DM Sans',sans-serif;
+    font-size:.83rem; padding:.5rem .75rem; outline:none; resize:none; height:52px;
+    transition:border-color .2s;
+  }
+  .ej-nota:focus { border-color:var(--green-dim); }
+  .ej-nota::placeholder { color:var(--muted); font-size:.8rem; }
+
+  .ej-add-btn {
+    width:100%; padding:.7rem;
+    background:rgba(74,222,128,.07); border:1px dashed rgba(74,222,128,.3);
+    border-radius:10px; color:var(--green); font-family:'DM Sans',sans-serif;
+    font-size:.85rem; font-weight:500; cursor:pointer; transition:all .2s;
+  }
+  .ej-add-btn:hover { background:rgba(74,222,128,.12); border-style:solid; }
+
+  .bw-toggle {
+    display:flex; align-items:center; gap:.4rem;
+    font-size:.78rem; color:var(--muted); cursor:pointer;
+    padding:.5rem 0; white-space:nowrap;
+  }
+  .bw-toggle input { width:14px; height:14px; cursor:pointer; accent-color:var(--green); }
+
 </style>
 </head>
 <body>
@@ -197,6 +336,7 @@
   <button class="tab-btn active" onclick="switchTab('resumen')">📊 Resumen</button>
   <button class="tab-btn" onclick="switchTab('modelo')">🧠 Mi modelo</button>
   <button class="tab-btn" onclick="switchTab('historial')">📋 Historial</button>
+  <button class="tab-btn" onclick="switchTab('entrenamiento')">💪 Entrenamiento</button>
 </div>
 
 <main>
@@ -346,6 +486,59 @@
     <div id="hist-list"></div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════
+       TAB 4 — ENTRENAMIENTO PLN
+  ════════════════════════════════════════════════ -->
+  <div class="panel" id="tab-entrenamiento">
+
+    <div class="section-head" style="margin-top:0">
+      <h3>Registrar entrenamiento</h3>
+      <p>Añade ejercicios y analiza el desgaste muscular</p>
+    </div>
+
+    <div class="ent-layout">
+
+      <!-- Columna izquierda: constructor -->
+      <div>
+        <div class="ent-card">
+          <h4>Ejercicios de la sesión</h4>
+
+          <div class="ej-builder" id="ej-builder"></div>
+
+          <button class="ej-add-btn" onclick="addEjercicio()">+ Añadir ejercicio</button>
+
+          <div class="ent-row" style="margin-top:1rem">
+            <div class="ent-field">
+              <label>Masa magra (kg)</label>
+              <input type="number" id="ent-masa" class="ej-input" value="70" min="30" max="150" step="0.5" style="width:110px">
+            </div>
+            <button class="ent-btn" id="ent-btn" onclick="analizarEntreno()">Analizar sesión</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna derecha: resultados -->
+      <div>
+        <div class="ent-card" style="height:100%">
+          <h4>Desgaste por músculo</h4>
+          <div class="ent-empty" id="ent-empty">Añade ejercicios y pulsa Analizar</div>
+          <div class="muscle-list" id="ent-muscle-list" style="display:none"></div>
+          <div id="ent-alertas"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- NLP: percepción por ejercicio -->
+    <div id="ent-nlp-card" style="display:none; margin-top:1.5rem">
+      <div class="ent-card">
+        <h4>Percepción de esfuerzo detectada (NLP)</h4>
+        <div class="nlp-list" id="ent-nlp-list"></div>
+      </div>
+    </div>
+
+  </div>
+
 </main>
 
 <script>
@@ -356,7 +549,7 @@
   function logout() { localStorage.clear(); window.location.href = '/'; }
 
   // ── Tabs ────────────────────────────────────────
-  const tabs = ['resumen','modelo','historial'];
+  const tabs = ['resumen','modelo','historial','entrenamiento'];
   function switchTab(id) {
     tabs.forEach(t => {
       document.getElementById('tab-'+t).classList.toggle('active', t===id);
@@ -366,6 +559,7 @@
     });
     if (id==='modelo' && !window._modeloLoaded) loadModelo();
     if (id==='historial' && !window._histLoaded) loadHistorial();
+    if (id==='entrenamiento') resetEntreno();
   }
 
   // ── Helpers canvas ──────────────────────────────
@@ -694,6 +888,289 @@
   }
 
   loadResumen();
+
+  // ── TAB 4: ENTRENAMIENTO ────────────────────────
+  function resetEntreno() {
+    document.getElementById('ent-empty').style.display = 'block';
+    document.getElementById('ent-muscle-list').style.display = 'none';
+    document.getElementById('ent-nlp-card').style.display = 'none';
+    document.getElementById('ent-alertas').innerHTML = '';
+  }
+
+  async function analizarEntreno() {
+    const texto     = document.getElementById('ent-texto').value.trim();
+    const masa      = parseFloat(document.getElementById('ent-masa').value) || 70;
+    const btn       = document.getElementById('ent-btn');
+
+    if (!texto) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Analizando...';
+
+    try {
+      const res  = await fetch('/analizar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ texto, masa_magra: masa })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Error en el servidor');
+
+      renderDesgaste(data);
+      renderNLP(data);
+      renderAlertas(data);
+
+    } catch(e) {
+      document.getElementById('ent-alertas').innerHTML =
+        `<div class="ent-alert">Error: ${e.message}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Analizar';
+    }
+  }
+
+  function renderDesgaste(data) {
+    const lista = document.getElementById('ent-muscle-list');
+    const empty = document.getElementById('ent-empty');
+
+    if (!data.ejercicios || !data.ejercicios.length) {
+      empty.style.display = 'block';
+      lista.style.display = 'none';
+      return;
+    }
+
+    const max = Math.max(...data.ejercicios.map(e => e.desgaste));
+
+    lista.innerHTML = data.ejercicios.map(e => {
+      const pct   = max > 0 ? (e.desgaste / max) * 100 : 0;
+      const color = pct > 66 ? '#f87171' : pct > 33 ? '#fbbf24' : '#4ade80';
+      return `
+        <div class="muscle-row">
+          <div class="muscle-name">${e.nombre}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${pct.toFixed(1)}%;background:${color}"></div>
+          </div>
+          <div class="bar-val">${e.desgaste.toFixed(3)}</div>
+        </div>`;
+    }).join('');
+
+    empty.style.display = 'none';
+    lista.style.display = 'flex';
+  }
+
+  function renderNLP(data) {
+    if (!data.notas_nlp || !data.notas_nlp.length) return;
+    const card = document.getElementById('ent-nlp-card');
+    const list = document.getElementById('ent-nlp-list');
+
+    list.innerHTML = data.notas_nlp.map(n => {
+      const cls = n.pf < 0.95 ? 'pf-low' : n.pf > 1.05 ? 'pf-high' : 'pf-mid';
+      const label = n.pf < 0.95 ? 'Fácil' : n.pf > 1.05 ? 'Duro' : 'Normal';
+      return `
+        <div class="nlp-row">
+          <div class="nlp-nota">"${n.nota}"</div>
+          <span class="pf-pill ${cls}">${label} · ${n.pf.toFixed(2)}</span>
+        </div>`;
+    }).join('');
+
+    card.style.display = 'block';
+  }
+
+  function renderAlertas(data) {
+    const wrap = document.getElementById('ent-alertas');
+    let html = '';
+    if (data.alertas && data.alertas.length)
+      html += `<div class="ent-alert">⚠ Capacidad superada: ${data.alertas.join(', ')}</div>`;
+    if (data.no_encontrados && data.no_encontrados.length)
+      html += `<div class="ent-warn">Ejercicios no reconocidos: ${data.no_encontrados.join(', ')}</div>`;
+    wrap.innerHTML = html;
+  }
+
+  // ── TAB 4: ENTRENAMIENTO ────────────────────────
+  let _ejerciciosDisponibles = [];
+  let _ejCount = 0;
+
+  async function loadEjercicios() {
+    if (_ejerciciosDisponibles.length) return;
+    try {
+      const res  = await fetch('/ejercicios', { headers: { 'Authorization': 'Bearer ' + token } });
+      const data = await res.json();
+      _ejerciciosDisponibles = data.ejercicios;
+    } catch(e) { console.error('No se pudo cargar el léxico', e); }
+  }
+
+  function addEjercicio() {
+    const builder = document.getElementById('ej-builder');
+    const id = ++_ejCount;
+
+    const opts = _ejerciciosDisponibles.map(e =>
+      `<option value="${e}">${e.charAt(0).toUpperCase() + e.slice(1)}</option>`
+    ).join('');
+
+    const card = document.createElement('div');
+    card.className = 'ej-card';
+    card.id = `ej-${id}`;
+    card.innerHTML = `
+      <div class="ej-card-header">
+        <span class="ej-card-num">Ejercicio ${id}</span>
+        <button class="ej-remove" onclick="removeEjercicio(${id})" title="Eliminar">✕</button>
+      </div>
+      <div class="ej-fields">
+        <div class="ej-field">
+          <label>Ejercicio</label>
+          <select class="ej-select" id="ej-nombre-${id}">
+            <option value="">— Selecciona —</option>
+            ${opts}
+          </select>
+        </div>
+        <div class="ej-field">
+          <label>Series</label>
+          <input type="number" class="ej-input" id="ej-series-${id}" value="3" min="1" max="20">
+        </div>
+        <div class="ej-field">
+          <label>Reps</label>
+          <input type="number" class="ej-input" id="ej-reps-${id}" value="10" min="1" max="100">
+        </div>
+        <div class="ej-field" id="ej-peso-wrap-${id}">
+          <label>Peso (kg)</label>
+          <input type="number" class="ej-input" id="ej-peso-${id}" value="20" min="0" step="0.5">
+        </div>
+        <div class="ej-field">
+          <label>RIR</label>
+          <input type="number" class="ej-input" id="ej-rir-${id}" placeholder="—" min="0" max="10">
+        </div>
+      </div>
+      <label class="bw-toggle">
+        <input type="checkbox" id="ej-bw-${id}" onchange="toggleBW(${id})">
+        Peso corporal (BW)
+      </label>
+      <div class="ej-field">
+        <label>Nota / percepción</label>
+        <textarea class="ej-nota" id="ej-nota-${id}" placeholder="Ej: me costó bastante, sensación de mejora..."></textarea>
+      </div>
+    `;
+    builder.appendChild(card);
+  }
+
+  function removeEjercicio(id) {
+    const card = document.getElementById(`ej-${id}`);
+    if (card) card.remove();
+  }
+
+  function toggleBW(id) {
+    const bw   = document.getElementById(`ej-bw-${id}`).checked;
+    const wrap = document.getElementById(`ej-peso-wrap-${id}`);
+    wrap.style.opacity    = bw ? '.35' : '1';
+    wrap.style.pointerEvents = bw ? 'none' : 'auto';
+  }
+
+  function resetEntreno() {
+    loadEjercicios();
+    document.getElementById('ent-empty').style.display = 'block';
+    document.getElementById('ent-muscle-list').style.display = 'none';
+    document.getElementById('ent-nlp-card').style.display = 'none';
+    document.getElementById('ent-alertas').innerHTML = '';
+  }
+
+  async function analizarEntreno() {
+    const cards = document.querySelectorAll('#ej-builder .ej-card');
+    if (!cards.length) return;
+
+    const masa = parseFloat(document.getElementById('ent-masa').value) || 70;
+    const btn  = document.getElementById('ent-btn');
+
+    const ejercicios = [];
+    for (const card of cards) {
+      const id     = card.id.replace('ej-', '');
+      const nombre = document.getElementById(`ej-nombre-${id}`).value;
+      if (!nombre) continue;
+
+      const bw     = document.getElementById(`ej-bw-${id}`).checked;
+      const pesoEl = document.getElementById(`ej-peso-${id}`).value;
+      const rirEl  = document.getElementById(`ej-rir-${id}`).value;
+
+      ejercicios.push({
+        nombre,
+        series:  parseInt(document.getElementById(`ej-series-${id}`).value) || 3,
+        reps:    parseInt(document.getElementById(`ej-reps-${id}`).value)   || 10,
+        peso_kg: bw ? null : (parseFloat(pesoEl) || null),
+        es_bw:   bw,
+        rir:     rirEl !== '' ? parseInt(rirEl) : null,
+        nota:    document.getElementById(`ej-nota-${id}`).value.trim(),
+      });
+    }
+
+    if (!ejercicios.length) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Analizando...';
+
+    try {
+      const res  = await fetch('/analizar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ ejercicios, masa_magra: masa })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Error');
+
+      renderDesgaste(data);
+      renderNLP(data);
+      renderAlertas(data);
+
+    } catch(e) {
+      document.getElementById('ent-alertas').innerHTML =
+        `<div class="ent-alert">Error: ${e.message}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Analizar sesión';
+    }
+  }
+
+  function renderDesgaste(data) {
+    const lista = document.getElementById('ent-muscle-list');
+    const empty = document.getElementById('ent-empty');
+    if (!data.ejercicios?.length) { empty.style.display='block'; lista.style.display='none'; return; }
+
+    const max = Math.max(...data.ejercicios.map(e => e.desgaste));
+    lista.innerHTML = data.ejercicios.map(e => {
+      const pct   = max > 0 ? (e.desgaste / max) * 100 : 0;
+      const color = pct > 66 ? '#f87171' : pct > 33 ? '#fbbf24' : '#4ade80';
+      return `
+        <div class="muscle-row">
+          <div class="muscle-name">${e.nombre}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct.toFixed(1)}%;background:${color}"></div></div>
+          <div class="bar-val">${e.desgaste.toFixed(3)}</div>
+        </div>`;
+    }).join('');
+    empty.style.display = 'none';
+    lista.style.display = 'flex';
+  }
+
+  function renderNLP(data) {
+    if (!data.notas_nlp?.length) return;
+    const card = document.getElementById('ent-nlp-card');
+    document.getElementById('ent-nlp-list').innerHTML = data.notas_nlp.map(n => {
+      const cls   = n.pf < 0.95 ? 'pf-low' : n.pf > 1.05 ? 'pf-high' : 'pf-mid';
+      const label = n.pf < 0.95 ? 'Fácil' : n.pf > 1.05 ? 'Duro' : 'Normal';
+      return `
+        <div class="nlp-row">
+          <div class="nlp-nota"><strong style="color:var(--text)">${n.ejercicio}</strong> — "${n.nota}"</div>
+          <span class="pf-pill ${cls}">${label} · ${n.pf.toFixed(2)}</span>
+        </div>`;
+    }).join('');
+    card.style.display = 'block';
+  }
+
+  function renderAlertas(data) {
+    let html = '';
+    if (data.alertas?.length)
+      html += `<div class="ent-alert">⚠ Capacidad superada: ${data.alertas.join(', ')}</div>`;
+    if (data.no_encontrados?.length)
+      html += `<div class="ent-warn">Ejercicios no reconocidos en el léxico: ${data.no_encontrados.join(', ')}</div>`;
+    document.getElementById('ent-alertas').innerHTML = html;
+  }
+
 </script>
 </body>
 </html>

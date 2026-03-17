@@ -1,0 +1,30 @@
+{
+  "press banca": {
+    "series": 3,
+    "reps": 12,
+    "peso_kg": 50.0,
+    "es_bw": false,
+    "updated_at": "2026-03-17"
+  },
+  "jalon de triceps": {
+    "series": 4,
+    "reps": 12,
+    "peso_kg": 25.0,
+    "es_bw": false,
+    "updated_at": "2026-03-17"
+  },
+  "flexiones": {
+    "series": 4,
+    "reps": 12,
+    "peso_kg": null,
+    "es_bw": true,
+    "updated_at": "2026-03-17"
+  },
+  "polea de triceps": {
+    "series": 3,
+    "reps": 12,
+    "peso_kg": 25.0,
+    "es_bw": false,
+    "updated_at": "2026-03-17"
+  }
+}

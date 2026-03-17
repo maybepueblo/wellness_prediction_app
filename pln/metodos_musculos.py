@@ -5,6 +5,7 @@ import unicodedata
 import re
 import json
 from pathlib import Path
+from datetime import date
 
 VectorMusculo = NDArray[np.float32]
 
@@ -130,24 +131,22 @@ def f_apply(
     return f_nueva.astype(np.float32), alertas # fatiga act y musculos que superan capacidad max
  
  
-# procesa sesión completa
 def procesar_sesion(
     ejercicios:  list[dict],
     lexico:      dict[str, VectorMusculo],
     f_prev:      VectorMusculo,
     capacidad:   VectorMusculo,
+    ruta_lexicon_personal: str | Path | None = None,  # nuevo
 ) -> tuple[VectorMusculo, list[str], list[str]]:
-    # ejercicios de una sesión con f_wear y f_apply
-    # cada elemento es un dict con nombre, series, reps, rir, pf (NLP)
     d_total        = np.zeros(cuentaMusculo, dtype=np.float32)
     no_encontrados = []
- 
+
     for ej in ejercicios:
         m_ej = buscar_ejercicio(ej["nombre"], lexico)
         if m_ej is None:
             no_encontrados.append(ej["nombre"])
             continue
- 
+
         d = f_wear(
             series = ej["series"],
             reps   = ej["reps"],
@@ -156,8 +155,13 @@ def procesar_sesion(
             m_ej   = m_ej,
         )
         d_total += d
- 
+
     f_nueva, alertas = f_apply(f_prev, d_total, capacidad)
+
+    # Actualizar marcas personales si se proporcionó ruta
+    if ruta_lexicon_personal is not None:
+        actualizar_lexicon_personal(ejercicios, ruta_lexicon_personal)
+
     return f_nueva, alertas, no_encontrados
  
 

@@ -5,7 +5,7 @@ from parser import parsear_entrenamiento
 from esfuerzo_notas          import cargar_analizador, analizar_nota
 from metodos_musculos        import (
     cargar_lexico, procesar_sesion,
-    Musculo, cuentaMusculo,
+    Musculo, cuentaMusculo, actualizar_lexicon_personal,
 )
 
 # simulación de entrada
@@ -67,12 +67,14 @@ sesion = [
         "reps":   ej.reps,
         "rir":    ej.rir,
         "pf":     analizar_nota(ej.nota_raw, analizador),
+        "peso_kg": ej.peso_kg,   # nuevo
+        "es_bw":   ej.es_bw, 
     }
     for ej in ejercicios_log
 ]
 
 f_nueva, alertas, no_encontrados = procesar_sesion(
-    sesion, lexico, f_prev, capacidad
+    sesion, lexico, f_prev, capacidad, Path("lexicon_personal.json")
 )
 
 print()
